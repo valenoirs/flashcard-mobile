@@ -44,6 +44,14 @@ export default function CardModal(props: CardModalProps) {
     const [currentCardFacing, setCurrentCardFacing] =
         useState<CardFacingType>("front");
     const [cardPosition, setCardPosition] = useState<number>(0);
+    const [isShuffle, setIsShuffle] = useState<boolean>(false);
+    const [isReveal, setIsReveal] = useState<boolean>(false);
+
+    // word quessing
+    const [correctGuess, setCorrectGuess] = useState<number>(0);
+    const [wrongGuess, setWrongGuess] = useState<number>(0);
+    const [answer, setAnswer] = useState<string>("");
+    const [isAnswered, setIsAnswered] = useState<boolean>(false);
 
     const [cardID, setCardID] = useState<string>("");
     const [cardFront, setCardFront] = useState<string>("");
@@ -196,6 +204,14 @@ export default function CardModal(props: CardModalProps) {
         return array;
     }
 
+    const generateSequence = (length: number) => {
+        if (isShuffle) {
+            return generateShuffledSequence(length);
+        } else {
+            return Array.from({ length }, (_, index) => index);
+        }
+    };
+
     const openAddCardView = () => {
         setCardID("");
         setCardFront("");
@@ -215,18 +231,30 @@ export default function CardModal(props: CardModalProps) {
     };
 
     const openBackView = () => {
-        const seq = generateShuffledSequence(currentCardList.length);
+        const length = currentCardList.length;
+        const seq = generateSequence(length);
         setCardSequence(seq);
         setCardPosition(0);
+        setIsReveal(false);
+        setCorrectGuess(0);
+        setWrongGuess(0);
+        setAnswer("");
+        setIsAnswered(false);
         setInitialCardFacing("back");
         setCurrentCardFacing("back");
         setActiveSubView("START");
     };
 
     const openFrontView = () => {
-        const seq = generateShuffledSequence(currentCardList.length);
+        const length = currentCardList.length;
+        const seq = generateSequence(length);
         setCardSequence(seq);
         setCardPosition(0);
+        setIsReveal(false);
+        setCorrectGuess(0);
+        setWrongGuess(0);
+        setAnswer("");
+        setIsAnswered(false);
         setInitialCardFacing("front");
         setCurrentCardFacing("front");
         setActiveSubView("START");
@@ -234,6 +262,8 @@ export default function CardModal(props: CardModalProps) {
 
     const handleNextCard = () => {
         setCurrentCardFacing(initialCardFacing);
+        setAnswer("");
+        setIsAnswered(false);
         if (cardPosition < currentCardList.length - 1) {
             setCardPosition(cardPosition + 1);
         } else {
@@ -241,12 +271,44 @@ export default function CardModal(props: CardModalProps) {
         }
     };
 
-    const handleFlipCard = () => {
+    const handleCardFlip = () => {
         if (currentCardFacing === "front") {
             setCurrentCardFacing("back");
         } else {
             setCurrentCardFacing("front");
         }
+    };
+
+    const handleCardMode = () => {
+        setIsShuffle(!isShuffle);
+    };
+
+    const handleCardReveal = () => {
+        setIsReveal(!isReveal);
+    };
+
+    const handleAnswer = () => {
+        console.log("handle answer");
+        console.log(isAnswered);
+        const cardFacing = initialCardFacing === "front" ? "back" : "front";
+        console.log(currentCardList[cardSequence[cardPosition]]?.[cardFacing]);
+        console.log(
+            answer === currentCardList[cardSequence[cardPosition]]?.[cardFacing],
+        );
+        if (
+            !isAnswered &&
+            currentCardList[cardSequence[cardPosition]]?.[cardFacing]
+        ) {
+            if (
+                answer === currentCardList[cardSequence[cardPosition]]?.[cardFacing]
+            ) {
+                setCorrectGuess(correctGuess + 1);
+            } else {
+                setWrongGuess(wrongGuess + 1);
+            }
+        }
+        setAnswer("");
+        setIsAnswered(true);
     };
 
     const closeView = () => {
@@ -278,7 +340,9 @@ export default function CardModal(props: CardModalProps) {
                                         onPress={() => openEditCardView(item)}
                                     >
                                         <View style={styles.cardItemContent}>
-                                            <Text>{item.front}</Text>
+                                            <Text>
+                                                {item.front} ({item.back})
+                                            </Text>
                                         </View>
                                     </Pressable>
                                 );
@@ -314,26 +378,68 @@ export default function CardModal(props: CardModalProps) {
                             <Text>Add Card</Text>
                         </View>
                     </Pressable>
+                    <Pressable
+                        style={styles.actionItemContainer}
+                        onPress={() => handleCardMode()}
+                    >
+                        <View style={styles.actionItemContent}>
+                            <Text>Mode: {isShuffle ? "Shuffled" : "Ordered"}</Text>
+                        </View>
+                    </Pressable>
                 </View>
 
                 {activeSubView === "START" && (
                     <View style={styles.viewContainer}>
                         <View style={styles.modalCardView}>
-                            <Text>*{currentCardFacing}</Text>
+                            <Text>
+                                *{currentCardFacing} | Correct: {correctGuess} | Wrong:{" "}
+                                {wrongGuess} / {currentCardList.length}
+                            </Text>
                             <Text></Text>
                             <Text style={styles.cardText}>
                                 {currentCardList[cardSequence[cardPosition]]?.[
                                     currentCardFacing
                                 ] ?? "Loading..."}
                             </Text>
+                            <Text></Text>
+                            <Text style={styles.cardText}>
+                                {(isReveal &&
+                                    currentCardList[cardSequence[cardPosition]]?.[
+                                    currentCardFacing === "front" ? "back" : "front"
+                                    ]) ??
+                                    "Loading..."}
+                            </Text>
+                            <TextInput
+                                style={styles.textInput}
+                                placeholder="Answer"
+                                placeholderTextColor="#999999"
+                                onChangeText={(text) => setAnswer(text)}
+                                value={answer}
+                            />
+                            <Pressable
+                                style={styles.actionItemContainer}
+                                onPress={() => handleAnswer()}
+                            >
+                                <View style={styles.actionItemContent}>
+                                    <Text>Check</Text>
+                                </View>
+                            </Pressable>
                         </View>
                         <View style={styles.modalActionView}>
                             <Pressable
                                 style={styles.actionItemContainer}
-                                onPress={() => handleFlipCard()}
+                                onPress={() => handleCardFlip()}
                             >
                                 <View style={styles.actionItemContent}>
                                     <Text>Flip</Text>
+                                </View>
+                            </Pressable>
+                            <Pressable
+                                style={styles.actionItemContainer}
+                                onPress={() => handleCardReveal()}
+                            >
+                                <View style={styles.actionItemContent}>
+                                    <Text>Reveal</Text>
                                 </View>
                             </Pressable>
                             <Pressable
