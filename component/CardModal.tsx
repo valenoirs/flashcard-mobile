@@ -7,7 +7,6 @@ import {
   FlatList,
   Pressable,
   TextInput,
-  useWindowDimensions,
 } from "react-native"
 import config from "../config/config"
 import { SafeAreaView } from "react-native-safe-area-context"
@@ -28,6 +27,7 @@ type Card = {
   english: string
   meaning: string
   sentence: string
+  is_jukujikun: boolean
 }
 
 export default function CardModal(props: CardModalProps) {
@@ -234,7 +234,6 @@ export default function CardModal(props: CardModalProps) {
   }
 
   const nextCardHandler = () => {
-    console.log(currentCardList[cardSequence[cardPosition]]?.["sentence"])
     // setIsShowKana(false)
     // setIsShowTranslation(false)
     if (cardPosition < currentCardList.length - 1) {
@@ -282,7 +281,7 @@ export default function CardModal(props: CardModalProps) {
                 return (
                   <Pressable
                     style={styles.cardItemContainer}
-                    onPress={() => editCardViewHandler(item)}
+                    // onPress={() => editCardViewHandler(item)}
                   >
                     <View style={styles.cardItemContent}>
                       <Text>
@@ -307,14 +306,14 @@ export default function CardModal(props: CardModalProps) {
               <Text>Start</Text>
             </View>
           </Pressable>
-          <Pressable
-            style={styles.actionItemContainer}
-            onPress={() => addCardViewHandler()}
-          >
-            <View style={styles.actionItemContent}>
-              <Text>Add Card</Text>
-            </View>
-          </Pressable>
+          {/* <Pressable */}
+          {/*   style={styles.actionItemContainer} */}
+          {/*   onPress={() => addCardViewHandler()} */}
+          {/* > */}
+          {/*   <View style={styles.actionItemContent}> */}
+          {/*     <Text>Add Card</Text> */}
+          {/*   </View> */}
+          {/* </Pressable> */}
           <Pressable
             style={styles.actionItemContainer}
             onPress={() => cardModeHandler()}
@@ -328,6 +327,12 @@ export default function CardModal(props: CardModalProps) {
         {activeSubView === "START" && (
           <View style={styles.viewContainer}>
             <View style={styles.modalCardView}>
+              <Text style={{ color: "red" }}>
+                {isShowKana &&
+                currentCardList[cardSequence[cardPosition]]?.["is_jukujikun"]
+                  ? "熟字訓"
+                  : ""}
+              </Text>
               <Text>
                 {cardPosition + 1} / {currentCardList.length}
               </Text>
