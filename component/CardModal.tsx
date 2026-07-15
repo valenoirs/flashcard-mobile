@@ -7,12 +7,13 @@ import {
   FlatList,
   Pressable,
   TextInput,
+  useWindowDimensions,
 } from "react-native"
 import config from "../config/config"
 import { SafeAreaView } from "react-native-safe-area-context"
+import FuriganaSentence from "./FuriganaSentence"
 
 type SubViewType = "NONE" | "ADD" | "EDIT" | "START"
-type CardFacingType = "front" | "back"
 
 type CardModalProps = {
   setVisible: React.Dispatch<React.SetStateAction<boolean>>
@@ -22,10 +23,11 @@ type CardModalProps = {
 
 type Card = {
   id: string
-  front: string
-  back: string
-  note: string
-  class: string
+  vocab: string
+  kana: string
+  english: string
+  meaning: string
+  sentence: string
 }
 
 export default function CardModal(props: CardModalProps) {
@@ -39,19 +41,10 @@ export default function CardModal(props: CardModalProps) {
   const [activeSubView, setActiveSubView] = useState<SubViewType>("NONE")
   // const [selectedCard, setSelectedCard] = useState(1);
   const [cardSequence, setCardSequence] = useState<number[]>([])
-  const [initialCardFacing, setInitialCardFacing] =
-    useState<CardFacingType>("front")
-  const [currentCardFacing, setCurrentCardFacing] =
-    useState<CardFacingType>("front")
+  const [isShowKana, setIsShowKana] = useState<boolean>(false)
   const [cardPosition, setCardPosition] = useState<number>(0)
   const [isShuffle, setIsShuffle] = useState<boolean>(false)
-  const [isReveal, setIsReveal] = useState<boolean>(false)
-
-  // word quessing
-  const [correctGuess, setCorrectGuess] = useState<number>(0)
-  const [wrongGuess, setWrongGuess] = useState<number>(0)
-  const [answer, setAnswer] = useState<string>("")
-  const [isAnswered, setIsAnswered] = useState<boolean>(false)
+  const [isShowTranslation, setIsShowTranslation] = useState<boolean>(false)
 
   const [cardID, setCardID] = useState<string>("")
   const [cardFront, setCardFront] = useState<string>("")
@@ -212,7 +205,7 @@ export default function CardModal(props: CardModalProps) {
     }
   }
 
-  const openAddCardView = () => {
+  const addCardViewHandler = () => {
     setCardID("")
     setCardFront("")
     setCardBack("")
@@ -221,49 +214,29 @@ export default function CardModal(props: CardModalProps) {
     setActiveSubView("ADD")
   }
 
-  const openEditCardView = (card: Card) => {
+  const editCardViewHandler = (card: Card) => {
     setCardID(card.id)
-    setCardFront(card.front)
-    setCardBack(card.back)
-    setCardNote(card.note)
-    setCardClass(card.class)
+    // setCardFront(card.front)
+    // setCardBack(card.back)
+    // setCardNote(card.note)
+    // setCardClass(card.class)
     setActiveSubView("EDIT")
   }
 
-  const openBackView = () => {
+  const startHandler = () => {
     const length = currentCardList.length
     const seq = generateSequence(length)
     setCardSequence(seq)
     setCardPosition(0)
-    setIsReveal(false)
-    setCorrectGuess(0)
-    setWrongGuess(0)
-    setAnswer("")
-    setIsAnswered(false)
-    setInitialCardFacing("back")
-    setCurrentCardFacing("back")
+    setIsShowTranslation(false)
+    setIsShowKana(false)
     setActiveSubView("START")
   }
 
-  const openFrontView = () => {
-    const length = currentCardList.length
-    const seq = generateSequence(length)
-    setCardSequence(seq)
-    setCardPosition(0)
-    setIsReveal(false)
-    setCorrectGuess(0)
-    setWrongGuess(0)
-    setAnswer("")
-    setIsAnswered(false)
-    setInitialCardFacing("front")
-    setCurrentCardFacing("front")
-    setActiveSubView("START")
-  }
-
-  const handleNextCard = () => {
-    setCurrentCardFacing(initialCardFacing)
-    setAnswer("")
-    setIsAnswered(false)
+  const nextCardHandler = () => {
+    console.log(currentCardList[cardSequence[cardPosition]]?.["sentence"])
+    // setIsShowKana(false)
+    // setIsShowTranslation(false)
     if (cardPosition < currentCardList.length - 1) {
       setCardPosition(cardPosition + 1)
     } else {
@@ -271,47 +244,19 @@ export default function CardModal(props: CardModalProps) {
     }
   }
 
-  const handleCardFlip = () => {
-    if (currentCardFacing === "front") {
-      setCurrentCardFacing("back")
-    } else {
-      setCurrentCardFacing("front")
-    }
+  const showKanaHandler = () => {
+    setIsShowKana(!isShowKana)
   }
 
-  const handleCardMode = () => {
+  const cardModeHandler = () => {
     setIsShuffle(!isShuffle)
   }
 
-  const handleCardReveal = () => {
-    setIsReveal(!isReveal)
+  const showTranslationHandler = () => {
+    setIsShowTranslation(!isShowTranslation)
   }
 
-  const handleAnswer = () => {
-    console.log("handle answer")
-    console.log(isAnswered)
-    const cardFacing = initialCardFacing === "front" ? "back" : "front"
-    console.log(currentCardList[cardSequence[cardPosition]]?.[cardFacing])
-    console.log(
-      answer === currentCardList[cardSequence[cardPosition]]?.[cardFacing]
-    )
-    if (
-      !isAnswered &&
-      currentCardList[cardSequence[cardPosition]]?.[cardFacing]
-    ) {
-      if (
-        answer === currentCardList[cardSequence[cardPosition]]?.[cardFacing]
-      ) {
-        setCorrectGuess(correctGuess + 1)
-      } else {
-        setWrongGuess(wrongGuess + 1)
-      }
-    }
-    setAnswer("")
-    setIsAnswered(true)
-  }
-
-  const closeView = () => {
+  const closeViewHandler = () => {
     setActiveSubView("NONE")
   }
 
@@ -333,15 +278,15 @@ export default function CardModal(props: CardModalProps) {
           {currentCardList ? (
             <FlatList
               data={currentCardList}
-              renderItem={({ item }) => {
+              renderItem={({ item }: { item: Card }) => {
                 return (
                   <Pressable
                     style={styles.cardItemContainer}
-                    onPress={() => openEditCardView(item)}
+                    onPress={() => editCardViewHandler(item)}
                   >
                     <View style={styles.cardItemContent}>
                       <Text>
-                        {item.front} ({item.back})
+                        {item.vocab} / {item.kana} ({item.meaning})
                       </Text>
                     </View>
                   </Pressable>
@@ -356,23 +301,15 @@ export default function CardModal(props: CardModalProps) {
         <View style={styles.actionContainer}>
           <Pressable
             style={styles.actionItemContainer}
-            onPress={() => openFrontView()}
+            onPress={() => startHandler()}
           >
             <View style={styles.actionItemContent}>
-              <Text>Start Front</Text>
+              <Text>Start</Text>
             </View>
           </Pressable>
           <Pressable
             style={styles.actionItemContainer}
-            onPress={() => openBackView()}
-          >
-            <View style={styles.actionItemContent}>
-              <Text>Start Back</Text>
-            </View>
-          </Pressable>
-          <Pressable
-            style={styles.actionItemContainer}
-            onPress={() => openAddCardView()}
+            onPress={() => addCardViewHandler()}
           >
             <View style={styles.actionItemContent}>
               <Text>Add Card</Text>
@@ -380,7 +317,7 @@ export default function CardModal(props: CardModalProps) {
           </Pressable>
           <Pressable
             style={styles.actionItemContainer}
-            onPress={() => handleCardMode()}
+            onPress={() => cardModeHandler()}
           >
             <View style={styles.actionItemContent}>
               <Text>Mode: {isShuffle ? "Shuffled" : "Ordered"}</Text>
@@ -392,28 +329,37 @@ export default function CardModal(props: CardModalProps) {
           <View style={styles.viewContainer}>
             <View style={styles.modalCardView}>
               <Text>
-                *{currentCardFacing} | Correct: {correctGuess} | Wrong:{" "}
-                {wrongGuess} / {currentCardList.length}
+                {cardPosition + 1} / {currentCardList.length}
               </Text>
-              <Text></Text>
-              <Text style={styles.cardText}>
-                {currentCardList[cardSequence[cardPosition]]?.[
-                  currentCardFacing
-                ] ?? "Loading..."}
+              <Text style={styles.cardKanjiText}>
+                {currentCardList[cardSequence[cardPosition]]?.["vocab"] ??
+                  "Loading..."}
               </Text>
-              <Text></Text>
-              <Text style={styles.cardText}>
-                {(isReveal &&
-                  currentCardList[cardSequence[cardPosition]]?.[
-                    currentCardFacing === "front" ? "back" : "front"
-                  ]) ??
+              <Text style={styles.cardKanjiText}>
+                {(isShowKana &&
+                  currentCardList[cardSequence[cardPosition]]?.["kana"]) ??
+                  "Loading..."}
+              </Text>
+              <Text style={styles.cardEnglishText}>
+                {(isShowTranslation &&
+                  currentCardList[cardSequence[cardPosition]]?.["meaning"]) ??
+                  "Loading..."}
+              </Text>
+              <FuriganaSentence
+                htmlString={
+                  currentCardList[cardSequence[cardPosition]]?.["sentence"]
+                }
+              />
+              <Text style={styles.cardEnglishText}>
+                {(isShowTranslation &&
+                  currentCardList[cardSequence[cardPosition]]?.["english"]) ??
                   "Loading..."}
               </Text>
             </View>
             <View style={styles.modalActionView}>
               <Pressable
                 style={styles.actionItemContainer}
-                onPress={() => handleCardFlip()}
+                onPress={() => showKanaHandler()}
               >
                 <View style={styles.actionItemContent}>
                   <Text>Show Kana</Text>
@@ -421,7 +367,7 @@ export default function CardModal(props: CardModalProps) {
               </Pressable>
               <Pressable
                 style={styles.actionItemContainer}
-                onPress={() => handleCardReveal()}
+                onPress={() => showTranslationHandler()}
               >
                 <View style={styles.actionItemContent}>
                   <Text>Show Translation</Text>
@@ -429,7 +375,7 @@ export default function CardModal(props: CardModalProps) {
               </Pressable>
               <Pressable
                 style={styles.actionItemContainer}
-                onPress={() => handleNextCard()}
+                onPress={() => nextCardHandler()}
               >
                 <View style={styles.actionItemContent}>
                   <Text>Next</Text>
@@ -437,7 +383,7 @@ export default function CardModal(props: CardModalProps) {
               </Pressable>
               <Pressable
                 style={styles.actionItemContainer}
-                onPress={() => closeView()}
+                onPress={() => closeViewHandler()}
               >
                 <View style={styles.actionItemContent}>
                   <Text>Back</Text>
@@ -493,7 +439,7 @@ export default function CardModal(props: CardModalProps) {
               </Pressable>
               <Pressable
                 style={styles.actionItemContainer}
-                onPress={() => closeView()}
+                onPress={() => closeViewHandler()}
               >
                 <View style={styles.actionItemContent}>
                   <Text>Back</Text>
@@ -556,7 +502,7 @@ export default function CardModal(props: CardModalProps) {
               </Pressable>
               <Pressable
                 style={styles.actionItemContainer}
-                onPress={() => closeView()}
+                onPress={() => closeViewHandler()}
               >
                 <View style={styles.actionItemContent}>
                   <Text>Back</Text>
@@ -659,8 +605,11 @@ const styles = StyleSheet.create({
     width: "100%",
     backgroundColor: "white",
   },
-  cardText: {
-    fontSize: 30,
+  cardKanjiText: {
+    fontSize: 25,
+  },
+  cardEnglishText: {
+    fontSize: 20,
   },
   // alignItems: "center",
   // justifyContent: "center",
