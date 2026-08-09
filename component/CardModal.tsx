@@ -44,6 +44,7 @@ export default function CardModal(props: CardModalProps) {
   const [cardSequence, setCardSequence] = useState<number[]>([])
   const [isShowKana, setIsShowKana] = useState<boolean>(false)
   const [isShowJukujikun, setIsShowJukujikun] = useState<boolean>(false)
+  const [isShowCounter, setIsShowCounter] = useState<boolean>(false)
   const [cardPosition, setCardPosition] = useState<number>(0)
   const [isShuffle, setIsShuffle] = useState<boolean>(false)
   const [isShowTranslation, setIsShowTranslation] = useState<boolean>(false)
@@ -262,11 +263,15 @@ export default function CardModal(props: CardModalProps) {
     setIsShowJukujikun(!isShowJukujikun)
   }
 
+  const showCounterHandler = () => {
+    setIsShowCounter(!isShowCounter)
+  }
+
   const closeViewHandler = () => {
     setActiveSubView("NONE")
   }
 
-  const handleModalClose = () => {
+  const closeModalHandler = () => {
     setVisible(!isVisible)
     setActiveSubView("NONE")
     setCurrentCardList([])
@@ -277,7 +282,7 @@ export default function CardModal(props: CardModalProps) {
       animationType="slide"
       transparent={true}
       visible={isVisible}
-      onRequestClose={() => handleModalClose()}
+      onRequestClose={() => closeModalHandler()}
     >
       <SafeAreaView style={{ flex: 1, backgroundColor: "white" }}>
         <View style={styles.cardContainer}>
@@ -307,6 +312,36 @@ export default function CardModal(props: CardModalProps) {
         <View style={styles.actionContainer}>
           <Pressable
             style={styles.actionItemContainer}
+            onPress={() => showCounterHandler()}
+          >
+            {isShowCounter ? (
+              <FuriganaButtonText htmlString="カウンターを<ruby>表<rt>ひょう</rt></ruby><ruby>示<rt>じ</rt></ruby>" />
+            ) : (
+              <FuriganaButtonText htmlString="カウンターを<ruby>非<rt>ひ</rt></ruby><ruby>表<rt>ひょう</rt></ruby><ruby>示<rt>じ</rt></ruby>" />
+            )}
+          </Pressable>
+          <Pressable
+            style={styles.actionItemContainer}
+            onPress={() => showJukujikunHandler()}
+          >
+            {isShowJukujikun ? (
+              <FuriganaButtonText htmlString="<ruby>熟<rt>じゅく</rt></ruby><ruby>字<rt>じ</rt></ruby><ruby>訓<rt>くん</rt></ruby>を<ruby>非<rt>ひ</rt></ruby><ruby>表<rt>ひょう</rt></ruby><ruby>示<rt>じ</rt></ruby>" />
+            ) : (
+              <FuriganaButtonText htmlString="<ruby>熟<rt>じゅく</rt></ruby><ruby>字<rt>じ</rt></ruby><ruby>訓<rt>くん</rt></ruby>を<ruby>表<rt>ひょう</rt></ruby><ruby>示<rt>じ</rt></ruby>" />
+            )}
+          </Pressable>
+          <Pressable
+            style={styles.actionItemContainer}
+            onPress={() => cardModeHandler()}
+          >
+            {isShuffle ? (
+              <FuriganaButtonText htmlString="<ruby>順<rt>じゅん</rt></ruby><ruby>不<rt>ふ</rt></ruby><ruby>同<rt>どう</rt></ruby>" />
+            ) : (
+              <FuriganaButtonText htmlString="<ruby>順<rt>じゅん</rt></ruby><ruby>番<rt>ばん</rt></ruby><ruby>通<rt>とお</rt></ruby>り" />
+            )}
+          </Pressable>
+          <Pressable
+            style={styles.actionItemContainer}
             onPress={() => startHandler()}
           >
             <FuriganaButtonText htmlString="<ruby>始<rt>はじ</rt></ruby>める" />
@@ -319,16 +354,6 @@ export default function CardModal(props: CardModalProps) {
           {/*     <Text>Add Card</Text> */}
           {/*   </View> */}
           {/* </Pressable> */}
-          <Pressable
-            style={styles.actionItemContainer}
-            onPress={() => cardModeHandler()}
-          >
-            {isShuffle ? (
-              <FuriganaButtonText htmlString="<ruby>順<rt>じゅん</rt></ruby><ruby>不<rt>ふ</rt></ruby><ruby>同<rt>どう</rt></ruby>" />
-            ) : (
-              <FuriganaButtonText htmlString="<ruby>順<rt>じゅん</rt></ruby><ruby>番<rt>ばん</rt></ruby><ruby>通<rt>とお</rt></ruby>り" />
-            )}
-          </Pressable>
         </View>
 
         {activeSubView === "START" && (
@@ -341,7 +366,8 @@ export default function CardModal(props: CardModalProps) {
                   : ""}
               </Text>
               <Text>
-                {cardPosition + 1} / {currentCardList.length}
+                {isShowCounter &&
+                  `${cardPosition + 1} / ${currentCardList.length}`}
               </Text>
               <Text style={styles.cardKanjiText}>
                 {currentCardList[cardSequence[cardPosition]]?.["vocab"] ??
@@ -373,25 +399,33 @@ export default function CardModal(props: CardModalProps) {
                 style={styles.actionItemContainer}
                 onPress={() => showKanaHandler()}
               >
-                <FuriganaButtonText htmlString="かな<ruby>表示<rt>ひょうじ</rt></ruby>" />
+                {isShowKana ? (
+                  <FuriganaButtonText htmlString="かなを<ruby>非<rt>ひ</rt></ruby><ruby>表<rt>ひょう</rt></ruby><ruby>示<rt>じ</rt></ruby>" />
+                ) : (
+                  <FuriganaButtonText htmlString="かなを<ruby>表<rt>ひょう</rt></ruby><ruby>示<rt>じ</rt></ruby>" />
+                )}
               </Pressable>
               <Pressable
                 style={styles.actionItemContainer}
                 onPress={() => showTranslationHandler()}
               >
-                <FuriganaButtonText htmlString="<ruby>英語<rt>えいご</rt></ruby>を<ruby>表示<rt>ひょうじ</rt></ruby>" />
-              </Pressable>
-              <Pressable
-                style={styles.actionItemContainer}
-                onPress={() => showJukujikunHandler()}
-              >
-                <FuriganaButtonText htmlString="<ruby>熟字訓<rt>じゅくじくん</rt></ruby><ruby>表示<rt>ひょうじ</rt></ruby>" />
+                {isShowTranslation ? (
+                  <FuriganaButtonText htmlString="<ruby>英<rt>えい</rt></ruby><ruby>語<rt>ご</rt></ruby>を<ruby>非<rt>ひ</rt></ruby><ruby>表<rt>ひょう</rt></ruby><ruby>示<rt>じ</rt></ruby>" />
+                ) : (
+                  <FuriganaButtonText htmlString="<ruby>英<rt>えい</rt></ruby><ruby>語<rt>ご</rt></ruby>を<ruby>表<rt>ひょう</rt></ruby><ruby>示<rt>じ</rt></ruby>" />
+                )}
               </Pressable>
               <Pressable
                 style={styles.actionItemContainer}
                 onPress={() => nextCardHandler()}
               >
                 <FuriganaButtonText htmlString="<ruby>次<rt>つぎ</rt></ruby>へ" />
+              </Pressable>
+              <Pressable
+                style={styles.actionItemContainer}
+                onPress={() => closeViewHandler()}
+              >
+                <FuriganaButtonText htmlString="<ruby>戻<rt>もど</rt></ruby>る" />
               </Pressable>
             </View>
           </View>
@@ -534,7 +568,7 @@ const styles = StyleSheet.create({
     // borderColor: "#cccccc",
   },
   cardContainer: {
-    flex: 6,
+    flex: 5,
     paddingVertical: 30,
     padding: 15,
     flexDirection: "row",
@@ -545,7 +579,7 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
   },
   actionContainer: {
-    flex: 4,
+    flex: 5,
     paddingVertical: 30,
     padding: 15,
     // flexDirection: "row",
@@ -556,7 +590,6 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
   },
   actionItemContainer: {
-    flexDirection: "row",
     borderWidth: 1,
     borderColor: "#cccccc",
     borderRadius: 10,
@@ -576,7 +609,6 @@ const styles = StyleSheet.create({
     height: 50,
   },
   cardItemContent: {
-    width: "70%",
     padding: 10,
   },
   textInput: {
