@@ -11,6 +11,7 @@ import {
 import config from "../config/config"
 import { SafeAreaView } from "react-native-safe-area-context"
 import FuriganaSentence from "./FuriganaSentence"
+import FuriganaButtonText from "./FuriganaButtonText"
 
 type SubViewType = "NONE" | "ADD" | "EDIT" | "START"
 
@@ -42,6 +43,7 @@ export default function CardModal(props: CardModalProps) {
   // const [selectedCard, setSelectedCard] = useState(1);
   const [cardSequence, setCardSequence] = useState<number[]>([])
   const [isShowKana, setIsShowKana] = useState<boolean>(false)
+  const [isShowJukujikun, setIsShowJukujikun] = useState<boolean>(false)
   const [cardPosition, setCardPosition] = useState<number>(0)
   const [isShuffle, setIsShuffle] = useState<boolean>(false)
   const [isShowTranslation, setIsShowTranslation] = useState<boolean>(false)
@@ -234,8 +236,8 @@ export default function CardModal(props: CardModalProps) {
   }
 
   const nextCardHandler = () => {
-    // setIsShowKana(false)
-    // setIsShowTranslation(false)
+    setIsShowKana(false)
+    setIsShowTranslation(false)
     if (cardPosition < currentCardList.length - 1) {
       setCardPosition(cardPosition + 1)
     } else {
@@ -253,6 +255,10 @@ export default function CardModal(props: CardModalProps) {
 
   const showTranslationHandler = () => {
     setIsShowTranslation(!isShowTranslation)
+  }
+
+  const showJukujikunHandler = () => {
+    setIsShowJukujikun(!isShowJukujikun)
   }
 
   const closeViewHandler = () => {
@@ -328,7 +334,7 @@ export default function CardModal(props: CardModalProps) {
           <View style={styles.viewContainer}>
             <View style={styles.modalCardView}>
               <Text style={{ color: "red" }}>
-                {isShowKana &&
+                {isShowJukujikun &&
                 currentCardList[cardSequence[cardPosition]]?.["is_jukujikun"]
                   ? "熟字訓"
                   : ""}
@@ -366,33 +372,25 @@ export default function CardModal(props: CardModalProps) {
                 style={styles.actionItemContainer}
                 onPress={() => showKanaHandler()}
               >
-                <View style={styles.actionItemContent}>
-                  <Text>Show Kana</Text>
-                </View>
+                <FuriganaButtonText htmlString="かな<ruby>表示<rt>ひょうじ</rt></ruby>" />
               </Pressable>
               <Pressable
                 style={styles.actionItemContainer}
                 onPress={() => showTranslationHandler()}
               >
-                <View style={styles.actionItemContent}>
-                  <Text>Show Translation</Text>
-                </View>
+                <FuriganaButtonText htmlString="<ruby>英語<rt>えいご</rt></ruby>を<ruby>表示<rt>ひょうじ</rt></ruby>" />
+              </Pressable>
+              <Pressable
+                style={styles.actionItemContainer}
+                onPress={() => showJukujikunHandler()}
+              >
+                <FuriganaButtonText htmlString="<ruby>熟字訓<rt>じゅくじくん</rt></ruby><ruby>表示<rt>ひょうじ</rt></ruby>" />
               </Pressable>
               <Pressable
                 style={styles.actionItemContainer}
                 onPress={() => nextCardHandler()}
               >
-                <View style={styles.actionItemContent}>
-                  <Text>Next</Text>
-                </View>
-              </Pressable>
-              <Pressable
-                style={styles.actionItemContainer}
-                onPress={() => closeViewHandler()}
-              >
-                <View style={styles.actionItemContent}>
-                  <Text>Back</Text>
-                </View>
+                <FuriganaButtonText htmlString="<ruby>次<rt>つぎ</rt></ruby>へ" />
               </Pressable>
             </View>
           </View>
