@@ -87,15 +87,17 @@ export default function FuriganaSentence({
 
 const styles = StyleSheet.create({
   loadingText: {
-    fontSize: 26,
+    includeFontPadding: false,
+    fontSize: 20,
     textAlign: "center",
+    fontFamily: "NotoSansJP-Regular",
   },
   sentenceWrapper: {
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "center", // Change to "flex-start" if you want left-aligned text
     paddingHorizontal: 10,
-    marginVertical: 15,
+    marginVertical: 5,
   },
   charColumn: {
     alignItems: "center",
@@ -103,18 +105,22 @@ const styles = StyleSheet.create({
     marginHorizontal: 1, // Tiny breather room between characters
   },
   furiganaText: {
-    fontSize: 14,
-    minHeight: 16, // Forces empty spaces to take up the exact height of kana to prevent baseline jumping
-    marginBottom: 2,
+    includeFontPadding: false,
+    fontSize: 15,
     color: "#555", // Slightly dims the furigana for better readability
+    fontFamily: "NotoSansJP-Regular",
   },
   baseText: {
+    includeFontPadding: false,
     fontSize: 25, // Your preferred cardText size
-    lineHeight: 36,
+    lineHeight: 30,
     color: "#000",
+    fontFamily: "NotoSansJP-Regular",
   },
   boldText: {
+    includeFontPadding: false,
     fontWeight: "bold",
     color: "red",
+    fontFamily: "NotoSansJP-Bold",
   },
 })

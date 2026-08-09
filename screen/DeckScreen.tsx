@@ -55,7 +55,7 @@ export default function DeckScreen() {
                 <Pressable onPress={() => deckOnPressHandler(item)}>
                   <View style={styles.deckItem}>
                     <View style={styles.deckItemContent}>
-                      <Text>{item.name}</Text>
+                      <Text style={styles.text}>{item.name}</Text>
                     </View>
                   </View>
                 </Pressable>
@@ -94,6 +94,10 @@ const styles = StyleSheet.create({
   deckItemContent: {
     width: "70%",
     padding: 10,
+  },
+  text: {
+    includeFontPadding: false,
+    fontFamily: "NotoSansJP-Regular",
   },
   // alignItems: "center",
   // justifyContent: "center",

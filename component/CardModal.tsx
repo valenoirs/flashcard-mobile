@@ -296,7 +296,7 @@ export default function CardModal(props: CardModalProps) {
                     // onPress={() => editCardViewHandler(item)}
                   >
                     <View style={styles.cardItemContent}>
-                      <Text>
+                      <Text style={styles.text}>
                         {item.vocab} / {item.kana} ({item.meaning})
                       </Text>
                     </View>
@@ -315,9 +315,9 @@ export default function CardModal(props: CardModalProps) {
             onPress={() => showCounterHandler()}
           >
             {isShowCounter ? (
-              <FuriganaButtonText htmlString="カウンターを<ruby>表<rt>ひょう</rt></ruby><ruby>示<rt>じ</rt></ruby>" />
-            ) : (
               <FuriganaButtonText htmlString="カウンターを<ruby>非<rt>ひ</rt></ruby><ruby>表<rt>ひょう</rt></ruby><ruby>示<rt>じ</rt></ruby>" />
+            ) : (
+              <FuriganaButtonText htmlString="カウンターを<ruby>表<rt>ひょう</rt></ruby><ruby>示<rt>じ</rt></ruby>" />
             )}
           </Pressable>
           <Pressable
@@ -359,40 +359,49 @@ export default function CardModal(props: CardModalProps) {
         {activeSubView === "START" && (
           <View style={styles.viewContainer}>
             <View style={styles.modalCardView}>
-              <Text style={{ color: "red" }}>
+              <Text style={[styles.text, { color: "red" }]}>
                 {isShowJukujikun &&
                 currentCardList[cardSequence[cardPosition]]?.["is_jukujikun"]
                   ? "熟字訓"
                   : ""}
               </Text>
-              <Text>
-                {isShowCounter &&
-                  `${cardPosition + 1} / ${currentCardList.length}`}
-              </Text>
+
+              {isShowCounter && (
+                <Text>
+                  {cardPosition + 1} / {currentCardList.length}
+                </Text>
+              )}
               <Text style={styles.cardKanjiText}>
                 {currentCardList[cardSequence[cardPosition]]?.["vocab"] ??
                   "Loading..."}
               </Text>
-              <Text style={styles.cardKanjiText}>
-                {(isShowKana &&
-                  currentCardList[cardSequence[cardPosition]]?.["kana"]) ??
-                  "Loading..."}
-              </Text>
-              <Text style={styles.cardEnglishText}>
-                {(isShowTranslation &&
-                  currentCardList[cardSequence[cardPosition]]?.["meaning"]) ??
-                  "Loading..."}
-              </Text>
+
+              {(isShowKana && (
+                <Text style={styles.cardKanaText}>
+                  {currentCardList[cardSequence[cardPosition]]?.["kana"]}
+                </Text>
+              )) ??
+                "Loading..."}
+
+              {(isShowTranslation && (
+                <Text style={styles.cardEnglishText}>
+                  {currentCardList[cardSequence[cardPosition]]?.["meaning"]}
+                </Text>
+              )) ??
+                "Loading..."}
+
               <FuriganaSentence
                 htmlString={
                   currentCardList[cardSequence[cardPosition]]?.["sentence"]
                 }
               />
-              <Text style={styles.cardEnglishText}>
-                {(isShowTranslation &&
-                  currentCardList[cardSequence[cardPosition]]?.["english"]) ??
-                  "Loading..."}
-              </Text>
+
+              {(isShowTranslation && (
+                <Text style={styles.cardEnglishText}>
+                  {currentCardList[cardSequence[cardPosition]]?.["english"]}
+                </Text>
+              )) ??
+                "Loading..."}
             </View>
             <View style={styles.modalActionView}>
               <Pressable
@@ -562,8 +571,6 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
     backgroundColor: "white", // Solid background hides base list view cleanly
-    paddingVertical: 30,
-    padding: 15,
     // borderTopWidth: 1,
     // borderColor: "#cccccc",
   },
@@ -580,7 +587,7 @@ const styles = StyleSheet.create({
   },
   actionContainer: {
     flex: 5,
-    paddingVertical: 30,
+    // paddingVertical: 30,
     padding: 15,
     // flexDirection: "row",
     borderTopWidth: 1,
@@ -593,8 +600,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#cccccc",
     borderRadius: 10,
-    marginBottom: 20,
-    height: 50,
+    marginBottom: 10,
+    minHeight: 55,
   },
   actionItemContent: {
     padding: 10,
@@ -642,10 +649,24 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
   },
   cardKanjiText: {
+    includeFontPadding: false,
     fontSize: 25,
+    fontFamily: "NotoSansJP-Regular",
+  },
+  cardKanaText: {
+    includeFontPadding: false,
+    fontSize: 20,
+    color: "#555", // Slightly dims the furigana for better readability
+    fontFamily: "NotoSansJP-Regular",
   },
   cardEnglishText: {
-    fontSize: 20,
+    includeFontPadding: false,
+    fontSize: 15,
+  },
+  text: {
+    fontSize: 15,
+    includeFontPadding: false,
+    fontFamily: "NotoSansJP-Regular",
   },
   // alignItems: "center",
   // justifyContent: "center",
