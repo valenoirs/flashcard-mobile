@@ -232,6 +232,7 @@ export default function CardModal(props: CardModalProps) {
     setCardPosition(0)
     setIsShowTranslation(false)
     setIsShowKana(false)
+    setIsShowJukujikun(true)
     setActiveSubView("START")
   }
 
@@ -308,9 +309,7 @@ export default function CardModal(props: CardModalProps) {
             style={styles.actionItemContainer}
             onPress={() => startHandler()}
           >
-            <View style={styles.actionItemContent}>
-              <Text>Start</Text>
-            </View>
+            <FuriganaButtonText htmlString="<ruby>始<rt>はじ</rt></ruby>める" />
           </Pressable>
           {/* <Pressable */}
           {/*   style={styles.actionItemContainer} */}
@@ -324,9 +323,11 @@ export default function CardModal(props: CardModalProps) {
             style={styles.actionItemContainer}
             onPress={() => cardModeHandler()}
           >
-            <View style={styles.actionItemContent}>
-              <Text>Mode: {isShuffle ? "Shuffled" : "Ordered"}</Text>
-            </View>
+            {isShuffle ? (
+              <FuriganaButtonText htmlString="<ruby>順<rt>じゅん</rt></ruby><ruby>不<rt>ふ</rt></ruby><ruby>同<rt>どう</rt></ruby>" />
+            ) : (
+              <FuriganaButtonText htmlString="<ruby>順<rt>じゅん</rt></ruby><ruby>番<rt>ばん</rt></ruby><ruby>通<rt>とお</rt></ruby>り" />
+            )}
           </Pressable>
         </View>
 
